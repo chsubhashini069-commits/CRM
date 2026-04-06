@@ -61,4 +61,3 @@ npm run seed
 
 ---
 
-*Built with ❤️ by Antigravity AI*
