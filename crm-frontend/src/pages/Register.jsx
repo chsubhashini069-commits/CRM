@@ -1,0 +1,105 @@
+import { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+
+const Register = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'sales',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const { register } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const { name, email, password, role } = formData;
+
+  const onChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      await register(formData);
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <div className="auth-card glass-card">
+        <div className="auth-header">
+          <h2>Create Account</h2>
+          <p>Join the CRM team and start managing deals</p>
+        </div>
+
+        {error && <div className="error-message" style={{ color: 'var(--danger)', textAlign: 'center', marginBottom: '15px' }}>{error}</div>}
+
+        <form onSubmit={onSubmit}>
+          <div className="form-group">
+            <label>Full Name</label>
+            <input
+              type="text"
+              name="name"
+              value={name}
+              onChange={onChange}
+              required
+              placeholder="John Doe"
+            />
+          </div>
+          <div className="form-group">
+            <label>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              value={email}
+              onChange={onChange}
+              required
+              placeholder="name@company.com"
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              value={password}
+              onChange={onChange}
+              required
+              placeholder="••••••••"
+              minLength="6"
+            />
+          </div>
+          <div className="form-group">
+            <label>Role</label>
+            <select name="role" value={role} onChange={onChange}>
+              <option value="sales">Sales Rep</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }} disabled={loading}>
+            {loading ? 'Creating account...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          Already have an account? <Link to="/login" className="auth-link">Sign in</Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
